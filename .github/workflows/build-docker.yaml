@@ -23,6 +23,10 @@ jobs:
       with:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
+    - name: Apply the patch
+      run: |
+        pushd bookwyrm
+        git am ../patches/0001-Ship-the-app-and-ssl-config.patch
     - name: Build and push
       uses: docker/build-push-action@v3
       with:
