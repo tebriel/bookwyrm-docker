@@ -1,0 +1,69 @@
+From f5031da391ca74b0f859e61470313ae859bfc156 Mon Sep 17 00:00:00 2001
+From: Chris Moultrie <821688+tebriel@users.noreply.github.com>
+Date: Thu, 5 Jan 2023 21:10:14 +0000
+Subject: [PATCH] Allow static hosting in Azure
+
+---
+ .dockerignore        |  1 +
+ bookwyrm/settings.py | 16 ++++++++++++++++
+ requirements.txt     |  1 +
+ 3 files changed, 18 insertions(+)
+
+diff --git a/.dockerignore b/.dockerignore
+index a5130c8bd..5edf3de0d 100644
+--- a/.dockerignore
++++ b/.dockerignore
+@@ -5,3 +5,4 @@ __pycache__
+ .git
+ .github
+ .pytest*
++.env
+diff --git a/bookwyrm/settings.py b/bookwyrm/settings.py
+index 62f3092b2..fdc9a0483 100644
+--- a/bookwyrm/settings.py
++++ b/bookwyrm/settings.py
+@@ -334,6 +334,7 @@ if USE_HTTPS:
+     PROTOCOL = "https"
+ 
+ USE_S3 = env.bool("USE_S3", False)
++USE_AZURE = env.bool("USE_AZURE", False)
+ 
+ if USE_S3:
+     # AWS settings
+@@ -355,6 +356,21 @@ if USE_S3:
+     MEDIA_FULL_URL = MEDIA_URL
+     STATIC_FULL_URL = STATIC_URL
+     DEFAULT_FILE_STORAGE = "bookwyrm.storage_backends.ImagesStorage"
++elif USE_AZURE:
++    AZURE_ACCOUNT_NAME = env("AZURE_ACCOUNT_NAME")
++    AZURE_ACCOUNT_KEY = env("AZURE_ACCOUNT_KEY")
++    AZURE_CONTAINER = env("AZURE_CONTAINER")
++    AZURE_CUSTOM_DOMAIN = env("AZURE_CUSTOM_DOMAIN")
++    # Azure Static settings
++    STATIC_LOCATION = "static"
++    STATIC_URL = f"{PROTOCOL}://{AZURE_CUSTOM_DOMAIN}/{STATIC_LOCATION}/"
++    STATICFILES_STORAGE = "storages.backends.azure_storage.AzureStorage"
++    # Azure Media settings
++    MEDIA_LOCATION = "images"
++    MEDIA_URL = f"{PROTOCOL}://{AZURE_CUSTOM_DOMAIN}/{MEDIA_LOCATION}/"
++    MEDIA_FULL_URL = MEDIA_URL
++    STATIC_FULL_URL = STATIC_URL
++    DEFAULT_FILE_STORAGE = "storages.backends.azure_storage.AzureStorage"
+ else:
+     STATIC_URL = "/static/"
+     MEDIA_URL = "/images/"
+diff --git a/requirements.txt b/requirements.txt
+index 281a0edac..86aab41e5 100644
+--- a/requirements.txt
++++ b/requirements.txt
+@@ -24,6 +24,7 @@ responses==0.22.0
+ pytz>=2022.7
+ boto3==1.26.32
+ django-storages==1.11.1
++django-storages[azure]
+ django-redis==5.2.0
+ opentelemetry-api==1.11.1
+ opentelemetry-exporter-otlp-proto-grpc==1.11.1
+-- 
+2.25.1
+
