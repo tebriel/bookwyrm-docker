@@ -1,0 +1,65 @@
+From 235bba85ab41ac9d00cff48e05a5241d6beca7ac Mon Sep 17 00:00:00 2001
+From: Chris Moultrie <821688+tebriel@users.noreply.github.com>
+Date: Fri, 6 Jan 2023 01:33:15 +0000
+Subject: [PATCH] Updated Azure Storage backends
+
+---
+ bookwyrm/settings.py         |  8 ++++----
+ bookwyrm/storage_backends.py | 14 ++++++++++++++
+ 2 files changed, 18 insertions(+), 4 deletions(-)
+
+diff --git a/bookwyrm/settings.py b/bookwyrm/settings.py
+index 7e20564c4..605442a81 100644
+--- a/bookwyrm/settings.py
++++ b/bookwyrm/settings.py
+@@ -364,14 +364,14 @@ elif USE_AZURE:
+     AZURE_CUSTOM_DOMAIN = env("AZURE_CUSTOM_DOMAIN")
+     # Azure Static settings
+     STATIC_LOCATION = "static"
+-    STATIC_URL = f"{PROTOCOL}://{AZURE_CUSTOM_DOMAIN}/{STATIC_LOCATION}/"
+-    STATICFILES_STORAGE = "storages.backends.azure_storage.AzureStorage"
++    STATIC_URL = f"{PROTOCOL}://{AZURE_CUSTOM_DOMAIN}/{AZURE_CONTAINER}/{STATIC_LOCATION}/"
++    STATICFILES_STORAGE = "bookwyrm.storage_backends.AzureStaticStorage"
+     # Azure Media settings
+     MEDIA_LOCATION = "images"
+-    MEDIA_URL = f"{PROTOCOL}://{AZURE_CUSTOM_DOMAIN}/{MEDIA_LOCATION}/"
++    MEDIA_URL = f"{PROTOCOL}://{AZURE_CUSTOM_DOMAIN}/{AZURE_CONTAINER}/{MEDIA_LOCATION}/"
+     MEDIA_FULL_URL = MEDIA_URL
+     STATIC_FULL_URL = STATIC_URL
+-    DEFAULT_FILE_STORAGE = "storages.backends.azure_storage.AzureStorage"
++    DEFAULT_FILE_STORAGE = "bookwyrm.storage_backends.AzureImagesStorage"
+ else:
+     STATIC_URL = "/static/"
+     MEDIA_URL = "/images/"
+diff --git a/bookwyrm/storage_backends.py b/bookwyrm/storage_backends.py
+index 4fb0feff0..6dd9f522c 100644
+--- a/bookwyrm/storage_backends.py
++++ b/bookwyrm/storage_backends.py
+@@ -2,6 +2,7 @@
+ import os
+ from tempfile import SpooledTemporaryFile
+ from storages.backends.s3boto3 import S3Boto3Storage
++from storages.backends.azure_storage import AzureStorage
+ 
+ 
+ class StaticStorage(S3Boto3Storage):  # pylint: disable=abstract-method
+@@ -47,3 +48,16 @@ class ImagesStorage(S3Boto3Storage):  # pylint: disable=abstract-method
+             # Upload the object which will auto close the
+             # content_autoclose instance
+             return super()._save(name, content_autoclose)
++
++
++class AzureStaticStorage(AzureStorage):  # pylint: disable=abstract-method
++    """Storage class for Static contents"""
++
++    location = "static"
++
++
++class AzureImagesStorage(AzureStorage):  # pylint: disable=abstract-method
++    """Storage class for Image files"""
++
++    location = "images"
++    overwrite_files = False
+-- 
+2.25.1
+
