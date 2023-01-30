@@ -6,9 +6,7 @@ Subject: [PATCH] Ship the app and ssl config
 
 ---
  Dockerfile             | 1 +
- bookwyrm/settings.py   | 3 ++-
- celerywyrm/settings.py | 4 ++--
- 3 files changed, 5 insertions(+), 3 deletions(-)
+ 1 files changed, 1 insertions(+), 0 deletions(-)
 
 diff --git a/Dockerfile b/Dockerfile
 index b3cd26e88..6ec1c8e8b 100644
@@ -19,42 +17,3 @@ index b3cd26e88..6ec1c8e8b 100644
  COPY requirements.txt /app/
  RUN pip install -r requirements.txt --no-cache-dir
 +COPY . /app/
-diff --git a/bookwyrm/settings.py b/bookwyrm/settings.py
-index d960c6071..62f3092b2 100644
---- a/bookwyrm/settings.py
-+++ b/bookwyrm/settings.py
-@@ -232,7 +232,7 @@ else:
-     CACHES = {
-         "default": {
-             "BACKEND": "django_redis.cache.RedisCache",
--            "LOCATION": f"redis://:{REDIS_ACTIVITY_PASSWORD}@{REDIS_ACTIVITY_HOST}:{REDIS_ACTIVITY_PORT}/{REDIS_ACTIVITY_DB_INDEX}",
-+            "LOCATION": f"rediss://:{REDIS_ACTIVITY_PASSWORD}@{REDIS_ACTIVITY_HOST}:{REDIS_ACTIVITY_PORT}/{REDIS_ACTIVITY_DB_INDEX}?ssl_cert_reqs=required",
-             "OPTIONS": {
-                 "CLIENT_CLASS": "django_redis.client.DefaultClient",
-             },
-@@ -253,6 +253,7 @@ DATABASES = {
-         "PASSWORD": env("POSTGRES_PASSWORD", "bookwyrm"),
-         "HOST": env("POSTGRES_HOST", ""),
-         "PORT": env("PGPORT", 5432),
-+        "OPTIONS": {"sslmode": "require"},
-     },
- }
- 
-diff --git a/celerywyrm/settings.py b/celerywyrm/settings.py
-index 94e530221..1a7732494 100644
---- a/celerywyrm/settings.py
-+++ b/celerywyrm/settings.py
-@@ -9,8 +9,8 @@ REDIS_BROKER_HOST = env("REDIS_BROKER_HOST", "redis_broker")
- REDIS_BROKER_PORT = env("REDIS_BROKER_PORT", 6379)
- REDIS_BROKER_DB_INDEX = env("REDIS_BROKER_DB_INDEX", 0)
- 
--CELERY_BROKER_URL = f"redis://:{REDIS_BROKER_PASSWORD}@{REDIS_BROKER_HOST}:{REDIS_BROKER_PORT}/{REDIS_BROKER_DB_INDEX}"
--CELERY_RESULT_BACKEND = f"redis://:{REDIS_BROKER_PASSWORD}@{REDIS_BROKER_HOST}:{REDIS_BROKER_PORT}/{REDIS_BROKER_DB_INDEX}"
-+CELERY_BROKER_URL = f"rediss://:{REDIS_BROKER_PASSWORD}@{REDIS_BROKER_HOST}:{REDIS_BROKER_PORT}/{REDIS_BROKER_DB_INDEX}?ssl_cert_reqs=required"
-+CELERY_RESULT_BACKEND = f"rediss://:{REDIS_BROKER_PASSWORD}@{REDIS_BROKER_HOST}:{REDIS_BROKER_PORT}/{REDIS_BROKER_DB_INDEX}?ssl_cert_reqs=required"
- 
- CELERY_DEFAULT_QUEUE = "low_priority"
- CELERY_CREATE_MISSING_QUEUES = True
--- 
-2.25.1
-
