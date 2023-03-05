@@ -31,7 +31,6 @@ jobs:
         git config user.name "Chris Moultrie"
         git am ../patches/0001-Ship-the-app-and-ssl-config.patch
         git am ../patches/0002-Allow-static-hosting-in-Azure.patch
-        git am ../patches/0004-Updated-Azure-Storage-backends.patch
     - name: Build and push
       uses: docker/build-push-action@v3
       with:
