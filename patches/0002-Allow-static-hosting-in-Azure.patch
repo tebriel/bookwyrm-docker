@@ -1,7 +1,7 @@
-From f5031da391ca74b0f859e61470313ae859bfc156 Mon Sep 17 00:00:00 2001
+From 70760ba0b40559d2e7bb2e557ff8d1f8fb2d6066 Mon Sep 17 00:00:00 2001
 From: Chris Moultrie <821688+tebriel@users.noreply.github.com>
-Date: Thu, 5 Jan 2023 21:10:14 +0000
-Subject: [PATCH] Allow static hosting in Azure
+Date: Sun, 5 Mar 2023 10:05:20 -0500
+Subject: [PATCH] Make bookwyrm work with azure
 
 ---
  .dockerignore        |  1 +
@@ -19,21 +19,21 @@ index a5130c8bd..5edf3de0d 100644
  .pytest*
 +.env
 diff --git a/bookwyrm/settings.py b/bookwyrm/settings.py
-index 62f3092b2..fdc9a0483 100644
+index 4e5779e99..8ea0687b4 100644
 --- a/bookwyrm/settings.py
 +++ b/bookwyrm/settings.py
-@@ -334,6 +334,7 @@ if USE_HTTPS:
-     PROTOCOL = "https"
+@@ -341,6 +341,7 @@ if USE_HTTPS:
+     CSRF_COOKIE_SECURE = True
  
  USE_S3 = env.bool("USE_S3", False)
 +USE_AZURE = env.bool("USE_AZURE", False)
  
  if USE_S3:
      # AWS settings
-@@ -355,6 +356,21 @@ if USE_S3:
-     MEDIA_FULL_URL = MEDIA_URL
-     STATIC_FULL_URL = STATIC_URL
+@@ -364,6 +365,21 @@ if USE_S3:
      DEFAULT_FILE_STORAGE = "bookwyrm.storage_backends.ImagesStorage"
+     CSP_DEFAULT_SRC = ["'self'", AWS_S3_CUSTOM_DOMAIN] + CSP_ADDITIONAL_HOSTS
+     CSP_SCRIPT_SRC = ["'self'", AWS_S3_CUSTOM_DOMAIN] + CSP_ADDITIONAL_HOSTS
 +elif USE_AZURE:
 +    AZURE_ACCOUNT_NAME = env("AZURE_ACCOUNT_NAME")
 +    AZURE_ACCOUNT_KEY = env("AZURE_ACCOUNT_KEY")
@@ -53,17 +53,17 @@ index 62f3092b2..fdc9a0483 100644
      STATIC_URL = "/static/"
      MEDIA_URL = "/images/"
 diff --git a/requirements.txt b/requirements.txt
-index 281a0edac..86aab41e5 100644
+index 4aa81cb33..c7fe3b2e3 100644
 --- a/requirements.txt
 +++ b/requirements.txt
-@@ -24,6 +24,7 @@ responses==0.22.0
+@@ -25,6 +25,7 @@ responses==0.22.0
  pytz>=2022.7
- boto3==1.26.32
- django-storages==1.11.1
+ boto3==1.26.57
+ django-storages==1.13.2
 +django-storages[azure]
  django-redis==5.2.0
  opentelemetry-api==1.11.1
  opentelemetry-exporter-otlp-proto-grpc==1.11.1
 -- 
-2.25.1
+2.39.1
 
