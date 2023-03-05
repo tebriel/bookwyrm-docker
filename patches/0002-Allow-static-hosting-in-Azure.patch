@@ -5,9 +5,9 @@ Subject: [PATCH] Make bookwyrm work with azure
 
 ---
  .dockerignore        |  1 +
- bookwyrm/settings.py | 16 ++++++++++++++++
+ bookwyrm/settings.py | 18 ++++++++++++++++
  requirements.txt     |  1 +
- 3 files changed, 18 insertions(+)
+ 3 files changed, 20 insertions(+)
 
 diff --git a/.dockerignore b/.dockerignore
 index a5130c8bd..5edf3de0d 100644
@@ -30,7 +30,7 @@ index 4e5779e99..8ea0687b4 100644
  
  if USE_S3:
      # AWS settings
-@@ -364,6 +365,21 @@ if USE_S3:
+@@ -364,6 +365,23 @@ if USE_S3:
      DEFAULT_FILE_STORAGE = "bookwyrm.storage_backends.ImagesStorage"
      CSP_DEFAULT_SRC = ["'self'", AWS_S3_CUSTOM_DOMAIN] + CSP_ADDITIONAL_HOSTS
      CSP_SCRIPT_SRC = ["'self'", AWS_S3_CUSTOM_DOMAIN] + CSP_ADDITIONAL_HOSTS
@@ -49,6 +49,8 @@ index 4e5779e99..8ea0687b4 100644
 +    MEDIA_FULL_URL = MEDIA_URL
 +    STATIC_FULL_URL = STATIC_URL
 +    DEFAULT_FILE_STORAGE = "storages.backends.azure_storage.AzureStorage"
++    CSP_DEFAULT_SRC = ["'self'", AZURE_CUSTOM_DOMAIN] + CSP_ADDITIONAL_HOSTS
++    CSP_SCRIPT_SRC = ["'self'", AZURE_CUSTOM_DOMAIN] + CSP_ADDITIONAL_HOSTS
  else:
      STATIC_URL = "/static/"
      MEDIA_URL = "/images/"
